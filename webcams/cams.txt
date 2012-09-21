@@ -1,0 +1,8 @@
+http://service.ka-news.de/camimage.php?cam=0
+http://service.ka-news.de/camimage.php?cam=1
+http://service.ka-news.de/camimage.php?cam=2
+http://service.ka-news.de/camimage.php?cam=18
+http://service.ka-news.de/camimage.php?cam=19
+http://service.ka-news.de/camimage.php?cam=21
+http://service.ka-news.de/camimage.php?cam=22
+http://service.ka-news.de/camimage.php?cam=23

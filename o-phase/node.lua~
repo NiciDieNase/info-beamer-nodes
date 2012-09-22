@@ -1,0 +1,113 @@
+gl.setup(800, 600)
+
+-- rgb: grün= 133,196,65   0.52,0.77,0.25
+--      blau= 36, 110, 153 0.14,0.43,0.6
+
+color={0.14, 0.43 ,0.6 ,1}
+
+util.resource_loader{
+    "font.ttf";
+}
+
+local Absatz = "absatz"
+
+local textwidth = 0
+
+function Eventliste(events, x, y, spacing, size)
+    local row
+    local col
+    local next_kaputt
+
+    function select_next()
+        repeat
+            row = math.random(#events)
+        until events[row] ~= Absatz
+        local time, description = unpack(events[row])
+        col = math.random(#time - 1)
+        next_kaputt = sys.now() + math.random() * 60 + 30
+    end
+
+    select_next()
+
+    function draw()
+        local yy = y
+	local rgb_r, rgb_g, rgb_b, rgb_a = unpack(color)
+        for n, item in pairs(events) do
+            if item == Absatz then
+                yy = yy + size
+            else
+                local time, description = unpack(item)
+                if sys.now() > next_kaputt - 3 and n == row then
+                    local a = time:sub(1, col-1)
+                    local b = time:sub(col, col)
+                    local c = time:sub(col+1, col+1)
+                    local d = time:sub(col+2)
+                    time = a .. c .. b .. d
+                    font:write(x, yy, time, size, rgb_r, rgb_g, rgb_b, rgb_a)
+                elseif sys.now() > next_kaputt then
+                    select_next()
+                    font:write(x, yy, time, size, rgb_r, rgb_g, rgb_b, rgb_a)
+                else
+                    font:write(x, yy, time, size, rgb_r, rgb_g, rgb_b, rgb_a)
+                end
+                font:write(x + spacing, yy, description, size, rgb_r, rgb_g, rgb_b, rgb_a)
+                yy = yy + size
+            end
+        end
+    end
+    return {
+        draw = draw;
+    }
+end
+
+
+--local scrolltext = "FPN III"
+local scrolltext = "Hallo Erstis!"
+
+local events = {
+    {"heute", ""},  
+    {"12:00",   "Mitagessen (Mensa)"},
+    {"13:00",  "Vorstellung AAA, High Speed, SCSL"},
+    {"anschließend", "Infos zur Prüfungsordung"},
+    {"ab 18:00", "Kennenlernabend"},
+    Absatz,
+    {"morgen", ""},  
+    {"9:30",  "Erstifrühstück"},
+    {"11:30", "Begrüßung durch den Rektor (Aula)"},
+    {"14:00", "Einstufungstest Englisch"},
+    {"16:00", "IZ-Einführung (Aula)"},
+    {"ab 19:00",  "Kneipentour"},
+    Absatz,
+    {"", "(falls nicht anders angegeben in E201)"},
+}
+
+background = resource.load_image("Hochschule-Karlsruhe_300.png")
+-- Eventliste(events, x, y, spacing, size)
+local eventliste = Eventliste(events, 50, 50, 200, 25)
+
+showphotos = true
+
+i = WIDTH
+
+function node.render()
+
+--- black background
+	 gl.clear(0, 0, 0, 1)
+--- white background
+--	 gl.clear(.7, .7, .7, 1)
+
+	 background:draw(0,0,800,533,0.4)
+
+	 if showphotos then
+	 	 resource.render_child("photos"):draw(10,10,790,480)
+	 else
+		 eventliste:draw()
+	 end
+
+	 textwidth = font:write((i/1), 500, scrolltext, 100 , 0.52,0.77,0.25 ,0.6)
+	 i = i - 2
+	 if i < (-1 * textwidth - 2) then
+	    i = WIDTH + 2
+	 end
+
+end
